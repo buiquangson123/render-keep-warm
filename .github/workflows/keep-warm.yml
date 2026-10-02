@@ -1,4 +1,4 @@
-# Ping backend trên Render định kỳ để instance free không bị ngủ (sleep sau 15 phút không có request).
+# Ping các backend trên Render định kỳ để instance free không bị ngủ (sleep sau 15 phút không có request).
 name: Keep Render warm
 
 on:
@@ -10,8 +10,14 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    strategy:
+      fail-fast: false
+      matrix:
+        url:
+          - https://txnn-be.onrender.com
+          - https://food-be-4r22.onrender.com
     steps:
-      - name: Ping backend
+      - name: Ping ${{ matrix.url }}
         run: |
-          code=$(curl -s -o /dev/null -w "%{http_code}" -m 90 https://txnn-be.onrender.com || echo "000")
+          code=$(curl -s -o /dev/null -w "%{http_code}" -m 90 "${{ matrix.url }}" || echo "000")
           echo "HTTP status: $code"
